@@ -47,7 +47,7 @@ class GramEfficientNet(nn.Module):
         image_size = calculate_output_image_size(image_size, 2)
 
         # Build Gram Blocks
-        self.gram = torch.tensor([0,0,0,0])
+        self.gram = torch.cuda.FloatTensor([0,0,0,0])
         self._gram_block_3 = GramBlock(3)
         self._gram_block_16 = GramBlock(16)
         self._gram_block_24 = GramBlock(24)
@@ -215,7 +215,7 @@ class GramEfficientNet(nn.Module):
 
     @classmethod
     def from_pretrained(cls, model_name, weights_path=None, advprop=False,
-                        in_channels=3, num_classes=1000, **override_params):
+                        in_channels=3, num_classes=1000, load_fc=True, **override_params):
         """create an efficientnet model according to name.
 
         Args:
@@ -243,7 +243,7 @@ class GramEfficientNet(nn.Module):
             A pretrained efficientnet model.
         """
         model = cls.from_name(model_name, num_classes=num_classes, **override_params)
-        load_pretrained_weights(model, model_name, weights_path=weights_path, load_fc=(num_classes == 1000),
+        load_pretrained_weights(model, model_name, weights_path=weights_path, load_fc=load_fc,
                                 advprop=advprop)
         model._change_in_channels(in_channels)
         return model

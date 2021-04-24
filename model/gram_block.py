@@ -6,14 +6,14 @@ class Gram(nn.Module):
         super(Gram, self).__init__()
 
     def forward(self, x):
-        size_g = len(x[0])
-        gram_input = [[0.0 for i in range(size_g)] for j in range(size_g)]
+        a, b, c, d = x.size()
+        feature = x.view(a, b, c * d)
+        feature_t = feature.transpose(1,2)
 
-        for i in range(size_g):
-            for j in range(size_g):
-                gram_input[i][j] = float(torch.sum(x[0][i].mul(x[0][j])))
-
-        return torch.tensor(gram_input).unsqueeze(0).unsqueeze(0)
+        gram = feature.bmm(feature_t)
+        a, b, c = gram.size()
+        gram = gram.view(a, 1, b, c)
+        return gram
 
 
 class GramBlock(nn.Module):
